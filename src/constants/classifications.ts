@@ -139,12 +139,33 @@ export const NPC_TYPES: Record<NPCType, TypeDefinition> = {
     description: 'Performs dramatic gestures regardless of whether anyone is watching. Ignores all player chaos.',
     iconName: 'Film',
   },
+  'COMMON NPC': {
+    type: 'COMMON NPC',
+    title: 'Common NPC',
+    tagline: 'Standard 2-line dialogue vendor',
+    description: 'Reliably populates town centers and responds with generic affirmative dialogue.',
+    iconName: 'Users',
+  },
+  'BACKGROUND EXTRA': {
+    type: 'BACKGROUND EXTRA',
+    title: 'Background Extra',
+    tagline: 'Ambient world filler',
+    description: 'Consumes exactly 0.02ms of CPU frame budget. Exists solely to make the world look populated.',
+    iconName: 'Users',
+  },
   'BACKGROUND CHARACTER': {
     type: 'BACKGROUND CHARACTER',
     title: 'Background Character',
     tagline: 'Ambient world filler',
-    description: 'Consumes exactly 0.02ms of CPU frame budget. Exists solely to make the world look populated.',
+    description: 'Consumes minimal frame budget. Wanders standard urban background.',
     iconName: 'Users',
+  },
+  'HIGH LEVEL NPC': {
+    type: 'HIGH LEVEL NPC',
+    title: 'High Level NPC',
+    tagline: 'Advanced scripted authority',
+    description: 'Maintains strict compliance and controls critical background narrative checkpoints.',
+    iconName: 'Award',
   },
   'FINAL BOSS NPC': {
     type: 'FINAL BOSS NPC',
@@ -152,6 +173,13 @@ export const NPC_TYPES: Record<NPCType, TypeDefinition> = {
     tagline: 'Phased attack patterns only',
     description: 'Unflinching dominance over coordinate space. Zero spontaneous behavior detected.',
     iconName: 'Crown',
+  },
+  'MAIN CHARACTER': {
+    type: 'MAIN CHARACTER',
+    title: 'Rogue Main Character',
+    tagline: 'Uncontrolled protagonist energy',
+    description: 'Refuses all scripted paths and aggressively tests collision boundaries.',
+    iconName: 'Sparkles',
   },
 };
 

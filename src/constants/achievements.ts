@@ -1,0 +1,68 @@
+import type { Achievement } from '../types/npc';
+
+export const INITIAL_ACHIEVEMENTS: Achievement[] = [
+  {
+    id: 'loop-detected',
+    title: 'LOOP DETECTED',
+    description: 'Repeated the same trajectory pattern multiple times during a scan.',
+    icon: 'RotateCw',
+    unlocked: false,
+    category: 'behavior',
+  },
+  {
+    id: 'idle-master',
+    title: 'IDLE MASTER',
+    description: 'Stayed almost completely still with >85% idle stillness.',
+    icon: 'PauseCircle',
+    unlocked: false,
+    category: 'behavior',
+  },
+  {
+    id: 'background-extra',
+    title: 'BACKGROUND EXTRA',
+    description: 'Achieved an NPC Score between 41% and 60% with predictable movement.',
+    icon: 'Users',
+    unlocked: false,
+    category: 'score',
+  },
+  {
+    id: 'main-character',
+    title: 'MAIN CHARACTER',
+    description: 'Movement randomness exceeded 85% or NPC score dropped below 20%.',
+    icon: 'Sparkles',
+    unlocked: false,
+    category: 'score',
+  },
+  {
+    id: 'final-boss',
+    title: 'FINAL BOSS NPC',
+    description: 'Achieved an astounding NPC Score exceeding 95%. Absolute peak automation.',
+    icon: 'Crown',
+    unlocked: false,
+    category: 'score',
+  },
+  {
+    id: 'the-walker',
+    title: 'THE WALKER',
+    description: 'Continuous active movement maintained throughout the entire scan.',
+    icon: 'Footprints',
+    unlocked: false,
+    category: 'behavior',
+  },
+  {
+    id: 'sample-tester',
+    title: 'BENCHMARK OPERATOR',
+    description: 'Executed simulated behavioral profile analysis in Sample Mode.',
+    icon: 'Cpu',
+    unlocked: false,
+    category: 'secret',
+  },
+  {
+    id: 'hall-of-famer',
+    title: 'IMMORTALIZED NPC',
+    description: 'Registered a custom scan result into the global NPC Hall of Fame.',
+    icon: 'Trophy',
+    unlocked: false,
+    category: 'secret',
+  },
+];

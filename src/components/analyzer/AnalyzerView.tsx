@@ -3,8 +3,7 @@ import { Play, Square, Cpu } from 'lucide-react';
 import { CameraFeed } from './CameraFeed';
 import { LiveMetricsPanel } from './LiveMetricsPanel';
 import { EventLog } from './EventLog';
-import { SampleSelector } from './SampleSelector';
-import type { BehavioralMetrics, LiveEvent, SampleProfile, ScanResult } from '../../types/npc';
+import type { BehavioralMetrics, LiveEvent, ScanResult } from '../../types/npc';
 import { scoringEngine } from '../../services/scoringEngine';
 import { soundEffects } from '../../services/audioService';
 
@@ -19,8 +18,6 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
 }) => {
   const [isScanning, setIsScanning] = useState<boolean>(false);
   const [scanProgress, setScanProgress] = useState<number>(0);
-  const [activeSample, setActiveSample] = useState<SampleProfile | null>(null);
-  const [uploadedVideoUrl, setUploadedVideoUrl] = useState<string | null>(null);
   const [latestSnapshot, setLatestSnapshot] = useState<string | undefined>(undefined);
 
   const [currentMetrics, setCurrentMetrics] = useState<BehavioralMetrics>({
@@ -38,7 +35,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
     {
       id: 'init-1',
       timestamp: new Date().toLocaleTimeString(),
-      text: 'VISION MODULE ARMED // STANDBY',
+      text: 'OPTICAL SENSOR ARMED // STANDBY',
       type: 'info',
     },
   ]);
@@ -57,7 +54,6 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
     setEventLogs((prev) => [...prev.slice(-19), newEvent]);
   }, []);
 
-  // Handle Metrics Update from Camera/Vision
   const handleMetricsUpdate = useCallback((metrics: BehavioralMetrics) => {
     setCurrentMetrics(metrics);
   }, []);
@@ -86,11 +82,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
     if (currentMetrics.activityLevel >= 75 && currentMetrics.idleBehavior < 20) {
       onUnlockAchievement('the-walker');
     }
-    if (activeSample) {
-      onUnlockAchievement('sample-tester');
-    }
 
-    // Compile result via scoring engine
     const finalResult = scoringEngine.compileScanResult(
       currentMetrics,
       durationSeconds,
@@ -103,11 +95,10 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
       onUnlockAchievement('background-extra');
     }
 
-    // Trigger result reveal
     setTimeout(() => {
       onScanComplete(finalResult);
     }, 400);
-  }, [currentMetrics, latestSnapshot, activeSample, onScanComplete, onUnlockAchievement, addEventLog]);
+  }, [currentMetrics, latestSnapshot, onScanComplete, onUnlockAchievement, addEventLog]);
 
   // Start Scan sequence
   const startScan = () => {
@@ -120,7 +111,6 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
     addEventLog('SCAN SEQUENCE INITIATED', 'success');
     addEventLog('TRACKING TEMPORAL COORDINATE RECURRENCE', 'info');
 
-    // Interval for simulated progress & event triggers
     const SCAN_DURATION_MS = 8000;
     const intervalStep = 100;
 
@@ -130,12 +120,10 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
       const progress = Math.min(100, (elapsed / SCAN_DURATION_MS) * 100);
       setScanProgress(progress);
 
-      // Procedural scan tick sound
       if (elapsed % 800 === 0) {
         soundEffects.playScanTick();
       }
 
-      // Contextual Event Triggers during scan
       if (elapsed === 1500) {
         addEventLog('MEASURING CENTROID VELOCITY DELTAS', 'info');
       } else if (elapsed === 3200) {
@@ -164,35 +152,29 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
   };
 
   return (
-    <div className="space-y-6">
-      {/* Hero Section Banner */}
-      <div className="bg-cyber-surface/60 border border-cyber-border rounded-lg p-5 sm:p-6 hud-corner-box">
+    <div className="space-y-6 font-mono-tech">
+      {/* Top Banner */}
+      <div className="bg-cyber-surface/60 border border-cyber-border rounded-xl p-5 sm:p-6 hud-corner-box">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="font-display font-black text-2xl sm:text-3xl text-white glow-green">
-                NPC ANO
-              </span>
-              <span className="px-2 py-0.5 rounded text-xs font-mono-tech bg-cyber-green/10 border border-cyber-green text-cyber-green">
-                OPTICAL BEHAVIOR ENGINE
+                OPTICAL MOTION SCANNER
               </span>
             </div>
-            <h2 className="font-display text-sm sm:text-base text-cyber-green font-semibold tracking-wide">
-              “ARE YOU AN NPC?”
-            </h2>
-            <p className="text-xs font-mono-tech text-cyber-hudMuted mt-1">
-              Advanced behavioral movement analysis for absolutely no reason. Observes simple movement patterns and calculates fictional NPC classifications.
+            <p className="text-xs text-cyber-hudMuted mt-1">
+              Observes physical stillness, pacing repetition, and trajectory predictability in real-time.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-3 shrink-0">
             {!isScanning ? (
               <button
                 onClick={startScan}
                 className="flex items-center gap-2.5 px-6 py-3 rounded-lg bg-cyber-green text-black font-display font-bold text-sm tracking-wider hover:bg-cyber-greenGlow box-glow-green transition-all transform hover:scale-[1.02] active:scale-[0.98]"
               >
                 <Play className="w-4 h-4 fill-current" />
-                START ANALYSIS
+                START 8-SECOND SCAN
               </button>
             ) : (
               <button
@@ -200,76 +182,51 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
                 className="flex items-center gap-2.5 px-6 py-3 rounded-lg bg-cyber-crimson text-white font-display font-bold text-sm tracking-wider hover:bg-red-500 shadow-lg shadow-red-500/30 transition-all animate-pulse"
               >
                 <Square className="w-4 h-4 fill-current" />
-                STOP ANALYSIS
+                STOP SCAN
               </button>
             )}
           </div>
         </div>
       </div>
 
-      {/* Input Source & Preset Selector */}
-      <SampleSelector
-        activeSample={activeSample}
-        uploadedVideoUrl={uploadedVideoUrl}
-        onSelectSample={(sample) => {
-          setActiveSample(sample);
-          if (sample) {
-            setCurrentMetrics(sample.metrics);
-            addEventLog(`LOADED BENCHMARK PROFILE: ${sample.npcType}`, 'success');
-          }
-        }}
-        onUploadVideo={(url) => {
-          setUploadedVideoUrl(url);
-          if (url) {
-            addEventLog('UPLOADED LOCAL VIDEO STREAM', 'info');
-          }
-        }}
-      />
-
-      {/* Main Dual-Panel Workspace: Left Camera Feed / Right Live Telemetry */}
+      {/* Main Dual-Panel Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-        {/* Left Side: Camera / Video Feed */}
+        {/* Left Side: Camera */}
         <div className="lg:col-span-7 space-y-4">
           <CameraFeed
             isScanning={isScanning}
             onMetricsUpdate={handleMetricsUpdate}
             onEventLog={addEventLog}
-            activeSample={activeSample}
-            uploadedVideoUrl={uploadedVideoUrl}
             onCaptureSnapshot={(dataUrl) => setLatestSnapshot(dataUrl)}
-            onSelectSamplePreset={() => {
-              setActiveSample(null);
-            }}
           />
 
-          {/* Quick Action Buttons Below Camera */}
-          <div className="flex flex-wrap items-center justify-between gap-2 p-3 bg-cyber-surface/40 border border-cyber-borderSubtle rounded-lg font-mono-tech text-xs">
+          <div className="flex items-center justify-between p-3 bg-cyber-surface/40 border border-cyber-borderSubtle rounded-lg text-xs">
             <div className="flex items-center gap-2 text-cyber-hudMuted">
               <Cpu className="w-4 h-4 text-cyber-green" />
-              <span>SENSOR: {activeSample ? 'SIMULATED DATASET' : 'LOCAL WEBCAM'}</span>
+              <span>SENSOR: LOCAL WEBCAM (60 FPS)</span>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div>
               {!isScanning ? (
                 <button
                   onClick={startScan}
                   className="px-4 py-1.5 rounded bg-cyber-green/20 border border-cyber-green text-cyber-green font-bold hover:bg-cyber-green/30 box-glow-green transition-all"
                 >
-                  [ INITIATE SCAN ]
+                  [ START SCAN ]
                 </button>
               ) : (
                 <button
                   onClick={stopScan}
                   className="px-4 py-1.5 rounded bg-cyber-crimson/20 border border-cyber-crimson text-cyber-crimson font-bold hover:bg-cyber-crimson/30 transition-all"
                 >
-                  [ FINISH SCAN ]
+                  [ STOP ]
                 </button>
               )}
             </div>
           </div>
         </div>
 
-        {/* Right Side: Live Analysis Telemetry & Event Log */}
+        {/* Right Side: Live Metrics & Event Log */}
         <div className="lg:col-span-5 space-y-4 flex flex-col justify-between">
           <div className="flex-1">
             <LiveMetricsPanel

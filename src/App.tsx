@@ -4,22 +4,28 @@ import type { ActiveTab } from './components/common/Navbar';
 import { BootSequence } from './components/common/BootSequence';
 import { DisclaimerBanner } from './components/common/DisclaimerBanner';
 import { AchievementToast } from './components/common/AchievementToast';
+import { HeroLanding } from './components/home/HeroLanding';
+import { QuizAssessment } from './components/quiz/QuizAssessment';
+import { BiometricCheck } from './components/biometrics/BiometricCheck';
 import { AnalyzerView } from './components/analyzer/AnalyzerView';
 import { LeaderboardView } from './components/leaderboard/LeaderboardView';
 import { AchievementsView } from './components/achievements/AchievementsView';
-import { HowItWorksView } from './components/how-it-works/HowItWorksView';
 import { AboutView } from './components/about/AboutView';
 import { ResultModal } from './components/results/ResultModal';
-import type { Achievement, LeaderboardEntry, ScanResult } from './types/npc';
+import type { Achievement, BehavioralMetrics, LeaderboardEntry, ScanResult } from './types/npc';
+import type { QuizOption } from './constants/quizQuestions';
+import { scoringEngine } from './services/scoringEngine';
 import { storageService } from './services/storageService';
 import { soundEffects } from './services/audioService';
 
 export const App: React.FC = () => {
   const [bootComplete, setBootComplete] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<ActiveTab>('analyzer');
+  const [activeTab, setActiveTab] = useState<ActiveTab>('home');
   const [isMuted, setIsMuted] = useState<boolean>(false);
 
-  // Scan & Result State
+  // Assessment & Results State
+  const [quizAnswers, setQuizAnswers] = useState<Record<number, QuizOption>>({});
+  const [showBiometricCheck, setShowBiometricCheck] = useState<boolean>(false);
   const [activeResult, setActiveResult] = useState<ScanResult | null>(null);
 
   // Leaderboard & Achievements State
@@ -27,7 +33,6 @@ export const App: React.FC = () => {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [toastAchievement, setToastAchievement] = useState<Achievement | null>(null);
 
-  // Initialize storage
   useEffect(() => {
     setLeaderboard(storageService.getLeaderboard());
     setAchievements(storageService.getAchievements());
@@ -42,7 +47,39 @@ export const App: React.FC = () => {
     }
   };
 
-  const handleScanComplete = (result: ScanResult) => {
+  // Handle Quiz Completion
+  const handleQuizComplete = (answers: Record<number, QuizOption>, wantsBiometricCheck: boolean) => {
+    setQuizAnswers(answers);
+    handleUnlockAchievement('sample-tester');
+
+    if (wantsBiometricCheck) {
+      setShowBiometricCheck(true);
+    } else {
+      // Compile results immediately
+      const result = scoringEngine.compileQuizResult(answers);
+      storageService.saveScanResult(result);
+      setActiveResult(result);
+
+      if (result.npcScore >= 96) {
+        handleUnlockAchievement('final-boss');
+      } else if (result.npcScore <= 20) {
+        handleUnlockAchievement('main-character');
+      } else if (result.npcScore >= 41 && result.npcScore <= 60) {
+        handleUnlockAchievement('background-extra');
+      }
+    }
+  };
+
+  // Handle Biometric Scan complete after quiz
+  const handleBiometricComplete = (metrics: BehavioralMetrics, snapshotDataUrl?: string) => {
+    setShowBiometricCheck(false);
+    const result = scoringEngine.compileQuizResult(quizAnswers, metrics, snapshotDataUrl);
+    storageService.saveScanResult(result);
+    setActiveResult(result);
+  };
+
+  // Handle direct camera scan
+  const handleCameraScanComplete = (result: ScanResult) => {
     storageService.saveScanResult(result);
     setActiveResult(result);
   };
@@ -61,8 +98,8 @@ export const App: React.FC = () => {
   const unlockedAchievementsCount = achievements.filter((a) => a.unlocked).length;
 
   return (
-    <div className="min-h-screen bg-cyber-bg text-slate-100 cyber-grid relative selection:bg-cyber-green selection:text-black">
-      {/* CRT Scanline Overlay Effect */}
+    <div className="min-h-screen bg-cyber-bg text-slate-100 cyber-grid relative selection:bg-cyber-green selection:text-black font-sans">
+      {/* CRT Scanline Overlay */}
       <div className="fixed inset-0 crt-overlay pointer-events-none z-30 opacity-40" />
 
       {/* Boot Initializing Sequence */}
@@ -72,7 +109,6 @@ export const App: React.FC = () => {
 
       {/* Main App Layout */}
       <div className="flex flex-col min-h-screen">
-        {/* Top Navigation */}
         <Navbar
           activeTab={activeTab}
           setActiveTab={setActiveTab}
@@ -82,38 +118,65 @@ export const App: React.FC = () => {
           totalAchievements={achievements.length}
         />
 
-        {/* Global Disclaimer Header */}
         <DisclaimerBanner />
 
-        {/* Dynamic Content Views */}
         <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-          {activeTab === 'analyzer' && (
+          {/* Home Hero View */}
+          {activeTab === 'home' && (
+            <HeroLanding
+              onStartQuiz={() => setActiveTab('quiz')}
+              onStartCamera={() => setActiveTab('camera')}
+              onViewLeaderboard={() => setActiveTab('leaderboard')}
+            />
+          )}
+
+          {/* Quiz Assessment View */}
+          {activeTab === 'quiz' && (
+            showBiometricCheck ? (
+              <BiometricCheck
+                onScanComplete={handleBiometricComplete}
+                onSkip={() => {
+                  setShowBiometricCheck(false);
+                  const res = scoringEngine.compileQuizResult(quizAnswers);
+                  storageService.saveScanResult(res);
+                  setActiveResult(res);
+                }}
+              />
+            ) : (
+              <QuizAssessment
+                onComplete={handleQuizComplete}
+                onCancel={() => setActiveTab('home')}
+              />
+            )
+          )}
+
+          {/* Dedicated Camera View */}
+          {activeTab === 'camera' && (
             <AnalyzerView
-              onScanComplete={handleScanComplete}
+              onScanComplete={handleCameraScanComplete}
               onUnlockAchievement={handleUnlockAchievement}
             />
           )}
 
+          {/* Leaderboard View */}
           {activeTab === 'leaderboard' && (
             <LeaderboardView
               entries={leaderboard}
-              onStartNewScan={() => setActiveTab('analyzer')}
+              onStartNewScan={() => setActiveTab('quiz')}
             />
           )}
 
+          {/* Achievements View */}
           {activeTab === 'achievements' && (
             <AchievementsView
               achievements={achievements}
-              onStartScan={() => setActiveTab('analyzer')}
+              onStartScan={() => setActiveTab('quiz')}
             />
           )}
 
-          {activeTab === 'how-it-works' && (
-            <HowItWorksView onStartScan={() => setActiveTab('analyzer')} />
-          )}
-
+          {/* About View */}
           {activeTab === 'about' && (
-            <AboutView onStartScan={() => setActiveTab('analyzer')} />
+            <AboutView onStartScan={() => setActiveTab('quiz')} />
           )}
         </main>
 
@@ -125,12 +188,12 @@ export const App: React.FC = () => {
             onAddToLeaderboard={handleAddToLeaderboard}
             onScanAgain={() => {
               setActiveResult(null);
-              setActiveTab('analyzer');
+              setActiveTab('quiz');
             }}
           />
         )}
 
-        {/* Live Achievement Toast Popup */}
+        {/* Achievement Toast */}
         <AchievementToast
           achievement={toastAchievement}
           onClose={() => setToastAchievement(null)}
@@ -148,7 +211,7 @@ export const App: React.FC = () => {
               Fictional Entertainment Project // Built for absolutely no reason.
             </div>
             <div className="text-slate-600 text-[10px]">
-              SYS_REV: 2026.09 // LOCAL WEBCAM COMPUTER VISION
+              SYS_REV: 2026.09 // MULTI-FACTOR BEHAVIORAL ASSESSMENT
             </div>
           </div>
         </footer>

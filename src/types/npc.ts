@@ -1,3 +1,5 @@
+import type { QuizOption } from '../constants/quizQuestions';
+
 export interface BehavioralMetrics {
   movementRandomness: number;    // 0 - 100% (High = chaotic/human, Low = predictable)
   pathRepetition: number;        // 0 - 100% (High = looping back and forth)
@@ -27,7 +29,11 @@ export type NPCType =
   | 'CONFUSED NPC'
   | 'GUARD NPC'
   | 'CUTSCENE NPC'
-  | 'FINAL BOSS NPC';
+  | 'COMMON NPC'
+  | 'BACKGROUND EXTRA'
+  | 'HIGH LEVEL NPC'
+  | 'FINAL BOSS NPC'
+  | 'MAIN CHARACTER';
 
 export interface ScanResult {
   id: string;
@@ -44,6 +50,8 @@ export interface ScanResult {
   scanDuration: number;
   snapshotDataUrl?: string;
   customName?: string;
+  quizAnswers?: Record<number, QuizOption>;
+  assessmentMode: 'quiz' | 'biometric' | 'hybrid';
 }
 
 export interface LiveEvent {
@@ -60,7 +68,7 @@ export interface Achievement {
   icon: string;
   unlocked: boolean;
   unlockedAt?: number;
-  category: 'behavior' | 'score' | 'time' | 'secret';
+  category: 'behavior' | 'score' | 'time' | 'secret' | 'quiz';
 }
 
 export interface LeaderboardEntry {
@@ -73,6 +81,7 @@ export interface LeaderboardEntry {
   timestamp: number;
   avatarSeed?: string;
   isCustom?: boolean;
+  assessmentMode?: string;
 }
 
 export interface SampleProfile {

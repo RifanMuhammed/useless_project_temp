@@ -9,6 +9,9 @@
 - Team Lead: Rifan Muhammed - [College / Institution]
 - Member 2: Kevin P Tom - [College / Institution]
 
+### Hosted Project Link
+- 🌐 **Live Website**: [https://uselessprojecttemp-sandy.vercel.app](https://uselessprojecttemp-sandy.vercel.app)
+
 ### Project Description
 NPC ANO is a satirical cyber-diagnostic system that determines whether you possess authentic free will or are merely running on pre-compiled background NPC scripts. It combines a humorous multi-factor psychological scenario quiz, real-time reflex challenges, millisecond reaction latency tracking, and optional optical motion analysis.
 
@@ -91,6 +94,9 @@ graph TD
 # Video
 [Watch Live NPC ANO Project Demo Video](https://github.com/RifanMuhammed/useless_project_temp/releases/download/v1.0.0/Screen.Recording.2026-09-12.093215.mp4)
 *Demonstrating live test flow, scenario quiz, optional webcam scanner, and specimen ID card generation.*
+
+# Live Website
+[https://uselessprojecttemp-sandy.vercel.app](https://uselessprojecttemp-sandy.vercel.app)
 
 ## Team Innovations
 - **100% Client-Side & Private**: All calculations, sound synthesis, and webcam analysis run entirely in the browser without any external APIs, servers, or cloud dependencies.

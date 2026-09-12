@@ -25,6 +25,7 @@ export const App: React.FC = () => {
 
   // Assessment & Results State
   const [quizAnswers, setQuizAnswers] = useState<Record<number, QuizOption>>({});
+  const [quizLatency, setQuizLatency] = useState<number | undefined>(undefined);
   const [showBiometricCheck, setShowBiometricCheck] = useState<boolean>(false);
   const [activeResult, setActiveResult] = useState<ScanResult | null>(null);
 
@@ -48,15 +49,16 @@ export const App: React.FC = () => {
   };
 
   // Handle Quiz Completion
-  const handleQuizComplete = (answers: Record<number, QuizOption>, wantsBiometricCheck: boolean) => {
+  const handleQuizComplete = (answers: Record<number, QuizOption>, wantsBiometricCheck: boolean, averageLatencyMs?: number) => {
     setQuizAnswers(answers);
+    setQuizLatency(averageLatencyMs);
     handleUnlockAchievement('sample-tester');
 
     if (wantsBiometricCheck) {
       setShowBiometricCheck(true);
     } else {
-      // Compile results immediately
-      const result = scoringEngine.compileQuizResult(answers);
+      // Compile results immediately with high precision metrics
+      const result = scoringEngine.compileQuizResult(answers, undefined, undefined, averageLatencyMs);
       storageService.saveScanResult(result);
       setActiveResult(result);
 
@@ -73,7 +75,7 @@ export const App: React.FC = () => {
   // Handle Biometric Scan complete after quiz
   const handleBiometricComplete = (metrics: BehavioralMetrics, snapshotDataUrl?: string) => {
     setShowBiometricCheck(false);
-    const result = scoringEngine.compileQuizResult(quizAnswers, metrics, snapshotDataUrl);
+    const result = scoringEngine.compileQuizResult(quizAnswers, metrics, snapshotDataUrl, quizLatency);
     storageService.saveScanResult(result);
     setActiveResult(result);
   };

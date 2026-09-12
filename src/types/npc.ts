@@ -9,6 +9,17 @@ export interface BehavioralMetrics {
   movementRepetition: number;    // 0 - 100% (Repetitive cyclic micro-movement)
   predictability: number;        // 0 - 100% (Trajectory model certainty)
   loopDetected: boolean;         // True if spatial cycle threshold reached
+  
+  // Multi-Vector Biometric & Latency Enhancements
+  kineticVarianceScore?: number;        // 0.0 - 100.0%
+  conversationalEntropyScore?: number; // 0.0 - 100.0%
+  environmentalComplianceRating?: number; // 0.0 - 100.0%
+  rogueProtagonistPotentialIndex?: number; // 0.0 - 100.0%
+  reactionLatencyMs?: number;          // Milliseconds (e.g. 482.4ms)
+  decisionParalysisIndex?: number;     // 0 - 100%
+  diagnosticConfidence?: number;       // 0.0 - 100.0% (e.g. 98.4%)
+  headPositionStability?: number;      // 0 - 100%
+  microBlinkingRate?: number;          // Blinks per minute equivalent
 }
 
 export type NPCLevel =
@@ -35,6 +46,13 @@ export type NPCType =
   | 'FINAL BOSS NPC'
   | 'MAIN CHARACTER';
 
+export interface SubScores {
+  kineticVariance: number;          // Kinetic Variance Score %
+  conversationalEntropy: number;   // Conversational Entropy Score %
+  environmentalCompliance: number; // Environmental Compliance Rating %
+  rogueProtagonistIndex: number;   // Rogue Protagonist Potential Index %
+}
+
 export interface ScanResult {
   id: string;
   timestamp: number;
@@ -45,6 +63,10 @@ export interface ScanResult {
   mainCharacterPotential: number;
   mainCharacterReason: string;
   metrics: BehavioralMetrics;
+  subScores?: SubScores;
+  reactionLatencyMs?: number;
+  decisionParalysisIndex?: number;
+  diagnosticConfidence?: number;
   behaviorSummary: string;
   observations: string[];
   scanDuration: number;

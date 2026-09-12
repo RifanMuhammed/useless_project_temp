@@ -83,8 +83,7 @@ export class ScoringEngine {
     // Collect observation flavors
     const observations = options
       .map((opt) => opt.observationFlavor)
-      .filter(Boolean)
-      .slice(0, 4);
+      .filter(Boolean);
 
     return {
       score: normalizedScore,
@@ -103,15 +102,15 @@ export class ScoringEngine {
     const rawPotential = 100 - score + (dominantType === 'MAIN CHARACTER' ? 15 : -5);
     const clampedPotential = Number(Math.min(99.4, Math.max(1.2, rawPotential)).toFixed(1));
 
-    let reason = 'Subject demonstrates insufficient randomness for protagonist status.';
+    let reason = 'You show steady daily habits, keeping things simple and organized.';
     if (clampedPotential >= 80) {
-      reason = 'Extreme kinetic & psychological variance. Rogue protagonist status confirmed.';
+      reason = 'High creative & spontaneous energy! You have true main character energy.';
     } else if (clampedPotential >= 55) {
-      reason = 'Occasional breaks from scripted pathfinding. May be eligible for side-quest protagonist.';
+      reason = 'Occasional creative bursts! You show strong free will whenever you want to.';
     } else if (clampedPotential >= 35) {
-      reason = 'Subject exhibits borderline awareness of free will, but remains within safe background bounds.';
+      reason = 'You show clear moments of free will, but mostly enjoy a peaceful, steady routine.';
     } else if (score >= 90) {
-      reason = 'Subject shows zero protagonist traits. Perfectly optimized for ambient background render budget.';
+      reason = 'You love comfort and routine, leaving main-character drama to everyone else!';
     }
 
     return {
@@ -121,14 +120,58 @@ export class ScoringEngine {
   }
 
   /**
-   * Compile Complete Multi-Factor Scan Result
+   * Compile Multi-Vector Sub-Scores with Floating Point Precision
+   */
+  public calculateSubScores(
+    npcScore: number,
+    metrics: BehavioralMetrics,
+    options: QuizOption[]
+  ): {
+    kineticVariance: number;
+    conversationalEntropy: number;
+    environmentalCompliance: number;
+    rogueProtagonistIndex: number;
+  } {
+    const optionsCount = options.length || 1;
+    const optionContributions = options.map((o) => o.scoreContribution);
+    
+    // Calculate variance among answers
+    const avgContrib = optionContributions.reduce((a, b) => a + b, 0) / optionsCount;
+    const varianceSum = optionContributions.reduce((sum, c) => sum + Math.pow(c - avgContrib, 2), 0);
+    const entropyRaw = Math.min(100, Math.sqrt(varianceSum / optionsCount) * 4.5);
+
+    const kineticVariance = Number(
+      Math.min(99.9, Math.max(0.1, (metrics.movementRandomness * 0.6) + ((100 - metrics.pathRepetition) * 0.4))).toFixed(1)
+    );
+    const conversationalEntropy = Number(
+      Math.min(99.9, Math.max(0.1, entropyRaw + (100 - npcScore) * 0.3)).toFixed(1)
+    );
+    const environmentalCompliance = Number(
+      Math.min(99.9, Math.max(0.1, (npcScore * 0.7) + (metrics.predictability * 0.3))).toFixed(1)
+    );
+    const rogueProtagonistIndex = Number(
+      Math.min(99.9, Math.max(0.1, 100 - npcScore + (entropyRaw * 0.2))).toFixed(1)
+    );
+
+    return {
+      kineticVariance,
+      conversationalEntropy,
+      environmentalCompliance,
+      rogueProtagonistIndex,
+    };
+  }
+
+  /**
+   * Compile Complete Multi-Factor Scan Result with High Precision Metrics
    */
   public compileQuizResult(
     answers: Record<number, QuizOption>,
     biometricMetrics?: BehavioralMetrics,
-    snapshotDataUrl?: string
+    snapshotDataUrl?: string,
+    averageLatencyMs?: number
   ): ScanResult {
     const { score: quizScore, dominantType, observations: quizObservations } = this.calculateQuizScore(answers);
+    const options = Object.values(answers);
 
     let finalScore = quizScore;
     let metrics: BehavioralMetrics = {
@@ -144,10 +187,9 @@ export class ScoringEngine {
 
     let assessmentMode: 'quiz' | 'biometric' | 'hybrid' = 'quiz';
 
-    // If biometric camera data is provided, combine with 65/35 weight
     if (biometricMetrics) {
       assessmentMode = 'hybrid';
-      metrics = biometricMetrics;
+      metrics = { ...metrics, ...biometricMetrics };
       const bioScore =
         metrics.pathRepetition * this.weights.pathRepetition +
         metrics.idleBehavior * this.weights.idleBehavior +
@@ -158,15 +200,58 @@ export class ScoringEngine {
       finalScore = Math.round(quizScore * 0.65 + bioScore * 0.35);
     }
 
+    const reactionLatencyMs = Number((averageLatencyMs || (420 + Math.random() * 380)).toFixed(1));
+    const decisionParalysisIndex = Math.min(100, Math.round((reactionLatencyMs / 1200) * 100));
+    
+    // Diagnostic confidence calibration (94.0% - 99.6%)
+    const diagnosticConfidence = Number(
+      Math.min(99.6, Math.max(94.0, 94.5 + (options.length * 0.7) + (biometricMetrics ? 2.1 : 0))).toFixed(1)
+    );
+
+    const subScores = this.calculateSubScores(finalScore, metrics, options);
     const npcLevel = this.determineNPCLevel(finalScore);
     const { percentage: mainCharacterPotential, reason: mainCharacterReason } =
       this.calculateMainCharacterPotential(finalScore, dominantType);
 
-    // Build funny observations list
-    const observations = [...quizObservations];
-    if (observations.length < 3) {
+    // Build 5 clear, human-understandable, contextual observations
+    const observations: string[] = [];
+
+    // Obs 1: Biometric/Posture observation
+    if (biometricMetrics) {
+      const headStab = metrics.headPositionStability ?? Math.round(100 - metrics.movementRandomness);
+      observations.push(
+        `📷 Camera Posture: You held your body ${headStab > 70 ? 'completely still like a video game NPC' : 'with active, natural human movement'} (${headStab.toFixed(1)}% stillness rating).`
+      );
+    } else {
+      observations.push(
+        `🗺️ Routine Predictability: Based on your choices, your daily habits are estimated to be ${metrics.predictability.toFixed(1)}% predictable.`
+      );
+    }
+
+    // Obs 2: Latency & Decision Speed
+    observations.push(
+      `⏱️ Decision Speed: You took an average of ${reactionLatencyMs}ms per question (${decisionParalysisIndex > 50 ? 'noticeable hesitation & overthinking' : 'fast, confident instincts'}).`
+    );
+
+    // Obs 3: Conversational Style
+    observations.push(
+      `💬 Social Dialogue Style: ${subScores.conversationalEntropy > 50 ? 'Unpredictable & wild — you love breaking small-talk rules' : 'Polite & standard — you rely on safe canned responses'}. (${subScores.conversationalEntropy}% Dialogue Variety).`
+    );
+
+    // Obs 4: Specific Quiz Answer Observation
+    if (quizObservations.length > 0) {
+      observations.push(`🎯 Behavior Trait: ${quizObservations[0]}`);
+    } else {
+      observations.push('🎯 Behavior Trait: You follow environmental social rules without making a scene.');
+    }
+
+    // Obs 5: Extra observation or Protagonist Index
+    if (quizObservations.length > 1) {
+      observations.push(`⚡ Character Quirk: ${quizObservations[1]}`);
+    } else {
       const generalPool = FUNNY_OBSERVATIONS_POOL.general;
-      observations.push(generalPool[Math.floor(Math.random() * generalPool.length)]);
+      const fallbackObs = generalPool[Math.floor(Math.random() * generalPool.length)];
+      observations.push(`⚡ Overall Rating: ${fallbackObs || `Main Character Potential is ${subScores.rogueProtagonistIndex}% with ${diagnosticConfidence}% diagnostic confidence.`}`);
     }
 
     const subjectNum = Math.floor(1000 + Math.random() * 9000);
@@ -174,10 +259,10 @@ export class ScoringEngine {
 
     const behaviorSummary =
       finalScore >= 80
-        ? `High compliance detected. Subject exhibited automated background behavior across multiple social scenarios.`
+        ? `HIGH NPC SCORE (${finalScore}%): You are a model background character! You love predictable daily routines, safe small-talk, and zero drama.`
         : finalScore <= 30
-        ? `Extreme behavioral variance detected. Subject repeatedly selected disruptive protagonist dialogue options.`
-        : `Moderate baseline compliance. Subject functions reliably as an ambient background citizen.`;
+        ? `MAIN CHARACTER ENERGY (${finalScore}% NPC): You are a rogue protagonist! You reject boring rules, make chaotic choices, and break scripted expectations.`
+        : `BALANCED HUMAN (${finalScore}% NPC): You have a healthy mix of everyday routine and unpredictable free will. You blend in when needed, but stay true to yourself!`;
 
     return {
       id: `scan-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
@@ -188,9 +273,22 @@ export class ScoringEngine {
       npcType: dominantType,
       mainCharacterPotential,
       mainCharacterReason,
-      metrics,
+      metrics: {
+        ...metrics,
+        kineticVarianceScore: subScores.kineticVariance,
+        conversationalEntropyScore: subScores.conversationalEntropy,
+        environmentalComplianceRating: subScores.environmentalCompliance,
+        rogueProtagonistPotentialIndex: subScores.rogueProtagonistIndex,
+        reactionLatencyMs,
+        decisionParalysisIndex,
+        diagnosticConfidence,
+      },
+      subScores,
+      reactionLatencyMs,
+      decisionParalysisIndex,
+      diagnosticConfidence,
       behaviorSummary,
-      observations: observations.slice(0, 4),
+      observations: observations.slice(0, 5),
       scanDuration: 45,
       snapshotDataUrl,
       quizAnswers: answers,
@@ -199,7 +297,7 @@ export class ScoringEngine {
   }
 
   /**
-   * For pure camera scans
+   * For pure camera scans with high precision calibration
    */
   public compileScanResult(
     metrics: BehavioralMetrics,
@@ -226,6 +324,11 @@ export class ScoringEngine {
     const { percentage: mainCharacterPotential, reason: mainCharacterReason } =
       this.calculateMainCharacterPotential(npcScore, dominantType);
 
+    const subScores = this.calculateSubScores(npcScore, metrics, []);
+    const reactionLatencyMs = Number((340 + Math.random() * 210).toFixed(1));
+    const decisionParalysisIndex = Math.min(100, Math.round((reactionLatencyMs / 1200) * 100));
+    const diagnosticConfidence = Number((96.2 + Math.random() * 2.8).toFixed(1));
+
     const subjectNum = Math.floor(1000 + Math.random() * 9000);
     const subjectCode = `SUB-${subjectNum}`;
 
@@ -238,14 +341,27 @@ export class ScoringEngine {
       npcType: dominantType,
       mainCharacterPotential,
       mainCharacterReason,
-      metrics,
-      behaviorSummary: `Subject analyzed via optical frame differencing over ${scanDurationSeconds.toFixed(1)}s window.`,
+      metrics: {
+        ...metrics,
+        kineticVarianceScore: subScores.kineticVariance,
+        conversationalEntropyScore: subScores.conversationalEntropy,
+        environmentalComplianceRating: subScores.environmentalCompliance,
+        rogueProtagonistPotentialIndex: subScores.rogueProtagonistIndex,
+        reactionLatencyMs,
+        decisionParalysisIndex,
+        diagnosticConfidence,
+      },
+      subScores,
+      reactionLatencyMs,
+      decisionParalysisIndex,
+      diagnosticConfidence,
+      behaviorSummary: `Subject analyzed via high-precision optical frame differencing over ${scanDurationSeconds.toFixed(1)}s window.`,
       observations: [
-        metrics.idleBehavior > 60
-          ? 'Subject remained stationary long enough to trigger background optimization mode.'
-          : 'Path variance indicates active collision boundary exploration.',
-        'Behavior pattern analyzed for absolutely no scientific reason.',
-        'Subject would comfortably blend into Skyrim with zero texture mods.',
+        `Micro-head movement stability: ${(100 - metrics.movementRandomness).toFixed(1)}% delta over optical frame buffer.`,
+        `Idle posture lock duration: ${(metrics.idleBehavior * 0.05).toFixed(1)} seconds continuously stationary.`,
+        `Sub-score Environmental Compliance: ${subScores.environmentalCompliance}% rating.`,
+        `Decision Latency calibration: ${reactionLatencyMs}ms per frame diff window.`,
+        `Diagnostic confidence level certified at ${diagnosticConfidence}% signal stability.`,
       ],
       scanDuration: scanDurationSeconds,
       snapshotDataUrl,

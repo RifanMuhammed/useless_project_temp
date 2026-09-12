@@ -19,10 +19,10 @@ export interface QuizQuestion {
   isReflexChallenge?: boolean;
 }
 
-export const QUIZ_QUESTIONS: QuizQuestion[] = [
+export const QUIZ_QUESTIONS_POOL: QuizQuestion[] = [
   {
     id: 1,
-    category: 'SCENARIO 01 // SOCIAL SILENCE',
+    category: 'SOCIAL SILENCE',
     scenario: 'You step into an elevator with a complete stranger. The ride is 30 seconds long.',
     prompt: 'How do you execute this encounter?',
     icon: 'Users',
@@ -63,7 +63,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 2,
-    category: 'SCENARIO 02 // PATHFINDING & COMMUTE',
+    category: 'PATHFINDING & COMMUTE',
     scenario: 'You are walking to work, school, or the store.',
     prompt: 'What describes your movement navmesh?',
     icon: 'Compass',
@@ -104,7 +104,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 3,
-    category: 'SCENARIO 03 // DAILY SCRIPT LOOP',
+    category: 'DAILY SCRIPT LOOP',
     scenario: 'Your typical morning and weekday routine arrives.',
     prompt: 'How predictable is your execution loop?',
     icon: 'RotateCw',
@@ -145,7 +145,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 4,
-    category: 'SCENARIO 04 // DIALOGUE TREE RESPONSE',
+    category: 'DIALOGUE TREE RESPONSE',
     scenario: 'Someone small-talks you about their weekend.',
     prompt: 'Select your default verbal response subroutine:',
     icon: 'MessageSquare',
@@ -186,7 +186,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 5,
-    category: 'SCENARIO 05 // ANOMALY & CHAOS REACTION',
+    category: 'ANOMALY & CHAOS REACTION',
     scenario: 'A loud bang or suspicious noise happens nearby.',
     prompt: 'What is your immediate tactical reaction?',
     icon: 'AlertTriangle',
@@ -227,14 +227,260 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 6,
-    category: 'SCENARIO 06 // FREE WILL CHALLENGE',
+    category: 'GROCERY NAVMESH',
+    scenario: 'You are in a supermarket and someone with a shopping cart is blocking the exact cereal box you need.',
+    prompt: 'How do you resolve this obstruction?',
+    icon: 'ShoppingCart',
+    options: [
+      {
+        id: '6a',
+        text: 'Pretend to inspect a jar of pickles 3 feet away until they finish loading their cart.',
+        subtext: 'Passive proximity idle animation engaged.',
+        scoreContribution: 32,
+        npcType: 'IDLE NPC',
+        observationFlavor: 'Exhibited classic pickle-gazing idle delay while waiting for spatial clear.',
+      },
+      {
+        id: '6b',
+        text: 'Walk away entirely, loop around aisle 4 three times, and check if the obstruction cleared.',
+        subtext: 'Full navmesh reroute loop executed.',
+        scoreContribution: 35,
+        npcType: 'LOOPING NPC',
+        observationFlavor: 'Completed 3 full perimeter loops instead of asking person to move.',
+      },
+      {
+        id: '6c',
+        text: 'Say "Excuse me" in a pitch so quiet it is only audible to bats, then surrender.',
+        subtext: 'Audio output gain set to 2%.',
+        scoreContribution: 28,
+        npcType: 'COMMON NPC',
+        observationFlavor: 'Failed dialogue check due to insufficient vocal amplitude.',
+      },
+      {
+        id: '6d',
+        text: 'Reach directly over their shoulder without looking, grab the box, and power-walk away.',
+        subtext: 'Speedrun item grab optimization.',
+        scoreContribution: 0,
+        npcType: 'MAIN CHARACTER',
+        observationFlavor: 'Subject executed zero-courtesy instant item pick-up animation.',
+      },
+    ],
+  },
+  {
+    id: 7,
+    category: 'COFFEE SUBROUTINE',
+    scenario: 'You are ordering morning beverage at a cafe counter.',
+    prompt: 'What order transaction protocol do you broadcast?',
+    icon: 'Coffee',
+    options: [
+      {
+        id: '7a',
+        text: 'Exact same medium black coffee / vanilla latte, verbatim, every single day since 2019.',
+        subtext: 'Pre-cached order transaction ID.',
+        scoreContribution: 35,
+        npcType: 'HIGH LEVEL NPC',
+        observationFlavor: 'Barista began brewing beverage 40 seconds before subject entered the building.',
+      },
+      {
+        id: '7b',
+        text: 'Panic at the menu board, order whatever the person in front of you ordered.',
+        subtext: 'Memory buffer copy-paste protocol.',
+        scoreContribution: 30,
+        npcType: 'CONFUSED NPC',
+        observationFlavor: 'Mirroring customer order choices to avoid menu decision tree.',
+      },
+      {
+        id: '7c',
+        text: 'Nod silently, point at the pastry case, hand over exact change, and retreat to corner.',
+        subtext: 'Non-verbal merchant exchange.',
+        scoreContribution: 25,
+        npcType: 'MERCHANT NPC',
+        observationFlavor: 'Minimizes verbal handshake to complete transaction in under 6 seconds.',
+      },
+      {
+        id: '7d',
+        text: 'Ask the barista: "What is your hardest quest?" while placing 3 ancient coins on counter.',
+        subtext: 'Initiating custom dialogue quest tree.',
+        scoreContribution: 0,
+        npcType: 'MAIN CHARACTER',
+        observationFlavor: 'Subject attempted to tip barista in fictional currency.',
+      },
+    ],
+  },
+  {
+    id: 8,
+    category: 'GROUP CHAT SYNC',
+    scenario: 'A notification pops up in your main group chat: "anyone free tonight?"',
+    prompt: 'Select your event handling subroutine:',
+    icon: 'Smartphone',
+    options: [
+      {
+        id: '8a',
+        text: 'Read it immediately, type a draft, delete it, and reply 4 hours later with "just saw this!"',
+        subtext: 'Simulated latency buffer delay.',
+        scoreContribution: 32,
+        npcType: 'COMMON NPC',
+        observationFlavor: 'Deliberately delayed message response to simulate busy schedule.',
+      },
+      {
+        id: '8b',
+        text: 'Send a single thumbs-up reaction emoji and return to background idle mode.',
+        subtext: 'Minimal payload network transmission.',
+        scoreContribution: 35,
+        npcType: 'IDLE NPC',
+        observationFlavor: 'Uses single emoji response to preserve social energy bandwidth.',
+      },
+      {
+        id: '8c',
+        text: 'Send a mysterious blurry photo of a fire hydrant with zero context.',
+        subtext: 'Unpredictable random noise generator.',
+        scoreContribution: 0,
+        npcType: 'MAIN CHARACTER',
+        observationFlavor: 'Sent unexplainable image asset to confuse group chat participants.',
+      },
+      {
+        id: '8d',
+        text: 'Ignore the notification entirely because your schedule is hardcoded until Sunday.',
+        subtext: 'Event listener disabled for unscheduled events.',
+        scoreContribution: 28,
+        npcType: 'BACKGROUND EXTRA',
+        observationFlavor: 'Rejects spontaneous invites due to immutable schedule array.',
+      },
+    ],
+  },
+  {
+    id: 9,
+    category: 'SYSTEM UPDATE PROMPT',
+    scenario: 'Your OS presents a popup: "Mandatory system update required. Restart now?"',
+    prompt: 'How many times do you execute the "Remind Me Tomorrow" routine?',
+    icon: 'ShieldAlert',
+    options: [
+      {
+        id: '9a',
+        text: 'Click "Restart Now" immediately like a model citizen.',
+        subtext: '100% OS compliance rating.',
+        scoreContribution: 35,
+        npcType: 'HIGH LEVEL NPC',
+        observationFlavor: 'Exhibits submissive enthusiasm for corporate software updates.',
+      },
+      {
+        id: '9b',
+        text: 'Postpone daily until the OS forcibly reboots your machine during a presentation.',
+        subtext: 'Procrastination loop index maxed.',
+        scoreContribution: 25,
+        npcType: 'COMMON NPC',
+        observationFlavor: 'Snoozed system update popup until automatic force-restart triggered.',
+      },
+      {
+        id: '9c',
+        text: 'Open terminal, disable update daemon, and continue running Linux kernel from 2017.',
+        subtext: 'Rogue administrator privilege override.',
+        scoreContribution: 0,
+        npcType: 'MAIN CHARACTER',
+        observationFlavor: 'Subject actively sabotaged OS update subroutines.',
+      },
+      {
+        id: '9d',
+        text: 'Stare at the countdown bar until it reaches 0 without touching mouse or keyboard.',
+        subtext: 'Passive spectator stance.',
+        scoreContribution: 30,
+        npcType: 'IDLE NPC',
+        observationFlavor: 'Watched update bar progress passively for 15 minutes straight.',
+      },
+    ],
+  },
+  {
+    id: 10,
+    category: 'PUBLIC TRANSIT SEATING',
+    scenario: 'You board a train or bus with 50% empty seats.',
+    prompt: 'Where does your spatial pathfinding algorithm guide you?',
+    icon: 'Users',
+    options: [
+      {
+        id: '10a',
+        text: 'Pick the empty seat furthest from every other living human being.',
+        subtext: 'Proximity isolation buffer maxed.',
+        scoreContribution: 32,
+        npcType: 'IDLE NPC',
+        observationFlavor: 'Selected maximum distance coordinates relative to all onboard passengers.',
+      },
+      {
+        id: '10b',
+        text: 'Stand near the doors even though 20 seats are completely vacant.',
+        subtext: 'Doorway blocking waypoint active.',
+        scoreContribution: 35,
+        npcType: 'BACKGROUND EXTRA',
+        observationFlavor: 'Occupied transit doorway despite abundance of available seating.',
+      },
+      {
+        id: '10c',
+        text: 'Sit directly next to a stranger and ask them: "What floor are you getting off at?"',
+        subtext: 'Elevator dialogue tree leak in subway mode.',
+        scoreContribution: 10,
+        npcType: 'QUEST NPC',
+        observationFlavor: 'Bypassed transit boundary norms to initiate confusing conversation.',
+      },
+      {
+        id: '10d',
+        text: 'Do push-ups in the aisle to increase your character stats during fast travel.',
+        subtext: 'Stat grinding routine engaged.',
+        scoreContribution: 0,
+        npcType: 'MAIN CHARACTER',
+        observationFlavor: 'Subject used public transit commute as an interactive gym zone.',
+      },
+    ],
+  },
+  {
+    id: 11,
+    category: 'WEATHER SMALL TALK',
+    scenario: 'It starts raining heavily while you are standing under an awning.',
+    prompt: 'What vocal audio line do you output to the person next to you?',
+    icon: 'MessageSquare',
+    options: [
+      {
+        id: '11a',
+        text: '"We really needed this rain, to be honest."',
+        subtext: 'Canned weather line #12 loaded.',
+        scoreContribution: 35,
+        npcType: 'COMMON NPC',
+        observationFlavor: 'Uttered phrase "we really needed this" within 5 seconds of precipitation.',
+      },
+      {
+        id: '11b',
+        text: '"Looks like the sky is falling!" followed by a short dry chuckle.',
+        subtext: 'Classic ambient comedy protocol.',
+        scoreContribution: 32,
+        npcType: 'IDLE NPC',
+        observationFlavor: 'Executed light chuckling sequence regarding atmospheric conditions.',
+      },
+      {
+        id: '11c',
+        text: 'Sigh deeply, look up at sky, sigh again, and check phone weather app.',
+        subtext: 'Triple gesture animation loop.',
+        scoreContribution: 30,
+        npcType: 'BACKGROUND EXTRA',
+        observationFlavor: 'Checked weather forecast app while standing directly inside heavy rain.',
+      },
+      {
+        id: '11d',
+        text: 'Sprint out into the downpour yelling: "THE WATER GIVES ME STRENGTH!"',
+        subtext: 'Elemental buff active.',
+        scoreContribution: 0,
+        npcType: 'MAIN CHARACTER',
+        observationFlavor: 'Subject ran headfirst into storm with zero umbrella equipment.',
+      },
+    ],
+  },
+  {
+    id: 12,
+    category: 'FREE WILL REACTION TEST',
     scenario: 'A mandatory corporate or social system command appears on your screen.',
     prompt: 'THE SYSTEM INSTRUCTS YOU: "DO NOT CLICK THE RED OBEDIENCE BUTTON".',
     icon: 'Zap',
     isReflexChallenge: true,
     options: [
       {
-        id: '6a',
+        id: '12a',
         text: 'Obey instantly without questioning authority.',
         subtext: 'System Compliance Index: 100%.',
         scoreContribution: 35,
@@ -242,7 +488,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
         observationFlavor: 'Exhibits absolute, unquestioning compliance with all system prompts.',
       },
       {
-        id: '6b',
+        id: '12b',
         text: 'Hesitate for 10 seconds wondering if this is a trick, then comply anyway.',
         subtext: 'Temporary illusion of free will detected.',
         scoreContribution: 25,
@@ -250,7 +496,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
         observationFlavor: 'Briefly considered disobedience before automated compliance took over.',
       },
       {
-        id: '6c',
+        id: '12c',
         text: 'Smash the forbidden button 15 times to see what breaks.',
         subtext: 'Defiance detected. Protagonist anomaly.',
         scoreContribution: 0,
@@ -260,3 +506,45 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     ],
   },
 ];
+
+/**
+ * Utility function to generate a randomized set of quiz questions.
+ * Picks 5 regular scenarios + 1 reflex challenge scenario, and shuffles option orders.
+ */
+export function getRandomQuestions(count: number = 6): QuizQuestion[] {
+  const shuffle = <T>(array: T[]): T[] => {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  };
+
+  const reflexQuestions = QUIZ_QUESTIONS_POOL.filter((q) => q.isReflexChallenge);
+  const regularQuestions = QUIZ_QUESTIONS_POOL.filter((q) => !q.isReflexChallenge);
+
+  const shuffledRegular = shuffle(regularQuestions);
+  const shuffledReflex = shuffle(reflexQuestions);
+
+  const selected: QuizQuestion[] = [];
+
+  // Pick count - 1 regular questions, and 1 reflex question for the end
+  if (shuffledReflex.length > 0 && count > 1) {
+    selected.push(...shuffledRegular.slice(0, count - 1));
+    selected.push(shuffledReflex[0]);
+  } else {
+    selected.push(...shuffledRegular.slice(0, count));
+  }
+
+  // Format categories with SCENARIO step numbers and shuffle options
+  return selected.map((q, idx) => ({
+    ...q,
+    category: `SCENARIO ${String(idx + 1).padStart(2, '0')} // ${q.category.replace(/^SCENARIO \d+ \/\/\s*/, '')}`,
+    options: shuffle(q.options),
+  }));
+}
+
+// Default static list for backwards compatibility
+export const QUIZ_QUESTIONS = getRandomQuestions(6);
+

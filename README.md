@@ -89,7 +89,7 @@ graph TD
 
 ### Project Demo
 # Video
-[Add your video demo link here]
+[Watch Live NPC ANO Project Demo Video](https://github.com/RifanMuhammed/useless_project_temp/releases/download/v1.0.0/Screen.Recording.2026-09-12.093215.mp4)
 *Demonstrating live test flow, scenario quiz, optional webcam scanner, and specimen ID card generation.*
 
 ## Team Innovations

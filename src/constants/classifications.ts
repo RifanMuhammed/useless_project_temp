@@ -15,7 +15,7 @@ export const NPC_LEVELS: LevelDefinition[] = [
   {
     level: 'MAIN CHARACTER',
     minScore: 0,
-    maxScore: 20,
+    maxScore: 15,
     badgeColor: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40',
     borderColor: 'border-emerald-500',
     glowColor: 'shadow-emerald-500/50',
@@ -24,8 +24,8 @@ export const NPC_LEVELS: LevelDefinition[] = [
   },
   {
     level: 'UNPREDICTABLE HUMAN',
-    minScore: 21,
-    maxScore: 40,
+    minScore: 16,
+    maxScore: 35,
     badgeColor: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40',
     borderColor: 'border-cyan-500',
     glowColor: 'shadow-cyan-500/50',
@@ -34,8 +34,8 @@ export const NPC_LEVELS: LevelDefinition[] = [
   },
   {
     level: 'BACKGROUND EXTRA',
-    minScore: 41,
-    maxScore: 60,
+    minScore: 36,
+    maxScore: 55,
     badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
     borderColor: 'border-amber-500',
     glowColor: 'shadow-amber-500/50',
@@ -44,8 +44,8 @@ export const NPC_LEVELS: LevelDefinition[] = [
   },
   {
     level: 'COMMON NPC',
-    minScore: 61,
-    maxScore: 80,
+    minScore: 56,
+    maxScore: 75,
     badgeColor: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40',
     borderColor: 'border-indigo-500',
     glowColor: 'shadow-indigo-500/50',
@@ -54,8 +54,8 @@ export const NPC_LEVELS: LevelDefinition[] = [
   },
   {
     level: 'HIGH LEVEL NPC',
-    minScore: 81,
-    maxScore: 95,
+    minScore: 76,
+    maxScore: 90,
     badgeColor: 'bg-purple-500/20 text-purple-300 border-purple-500/40',
     borderColor: 'border-purple-500',
     glowColor: 'shadow-purple-500/50',
@@ -64,7 +64,7 @@ export const NPC_LEVELS: LevelDefinition[] = [
   },
   {
     level: 'FINAL BOSS NPC',
-    minScore: 96,
+    minScore: 91,
     maxScore: 100,
     badgeColor: 'bg-rose-500/20 text-rose-300 border-rose-500/40',
     borderColor: 'border-rose-500',

@@ -31,12 +31,101 @@ export class ScoringEngine {
    * Determine NPC Level based on score
    */
   public determineNPCLevel(score: number): NPCLevel {
-    if (score <= 20) return 'MAIN CHARACTER';
-    if (score <= 40) return 'UNPREDICTABLE HUMAN';
-    if (score <= 60) return 'BACKGROUND EXTRA';
-    if (score <= 80) return 'COMMON NPC';
-    if (score <= 95) return 'HIGH LEVEL NPC';
+    if (score <= 15) return 'MAIN CHARACTER';
+    if (score <= 35) return 'UNPREDICTABLE HUMAN';
+    if (score <= 55) return 'BACKGROUND EXTRA';
+    if (score <= 75) return 'COMMON NPC';
+    if (score <= 90) return 'HIGH LEVEL NPC';
     return 'FINAL BOSS NPC';
+  }
+
+  /**
+   * Calculate Shannon Entropy H(X) = -sum(p(x) * log2(p(x))) across quiz answers
+   */
+  public calculateShannonEntropy(options: QuizOption[]): number {
+    if (!options || options.length === 0) return 0;
+
+    const counts: Record<number, number> = {};
+    options.forEach((opt) => {
+      // Group by score tier bins
+      const bin = Math.floor(opt.scoreContribution / 10);
+      counts[bin] = (counts[bin] || 0) + 1;
+    });
+
+    const total = options.length;
+    let entropy = 0;
+    Object.values(counts).forEach((count) => {
+      const p = count / total;
+      if (p > 0) {
+        entropy -= p * Math.log2(p);
+      }
+    });
+
+    // Max entropy for 4 bins is log2(4) = 2.0
+    const maxEntropy = Math.log2(Math.min(4, total)) || 1;
+    const normalizedEntropy = Math.min(100, Math.max(0, (entropy / maxEntropy) * 100));
+    return Number(normalizedEntropy.toFixed(1));
+  }
+
+  /**
+   * Calculate Cosine Similarity between two N-dimensional vectors
+   */
+  public calculateCosineSimilarity(vecA: number[], vecB: number[]): number {
+    let dotProduct = 0;
+    let normA = 0;
+    let normB = 0;
+
+    for (let i = 0; i < vecA.length; i++) {
+      dotProduct += vecA[i] * vecB[i];
+      normA += vecA[i] * vecA[i];
+      normB += vecB[i] * vecB[i];
+    }
+
+    if (normA === 0 || normB === 0) return 0;
+    return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+  }
+
+  /**
+   * Cosine Similarity Vector Archetype Clustering
+   */
+  public determineClusteredArchetype(
+    score: number,
+    shannonEntropy: number,
+    kineticVariance: number,
+    compliance: number
+  ): NPCType {
+    const userVector = [score, shannonEntropy, kineticVariance, compliance];
+
+    // Reference Centroids for Archetype Tiers
+    const centroids: Record<string, number[]> = {
+      'MAIN CHARACTER': [10, 92, 90, 15],
+      'BACKGROUND EXTRA': [50, 50, 50, 55],
+      'BACKGROUND CHARACTER': [55, 45, 45, 60],
+      'COMMON NPC': [70, 35, 30, 75],
+      'HIGH LEVEL NPC': [88, 18, 15, 90],
+      'FINAL BOSS NPC': [98, 5, 5, 98],
+      'IDLE NPC': [85, 10, 5, 95],
+      'LOOPING NPC': [90, 8, 10, 92],
+      'WANDERING NPC': [45, 65, 60, 40],
+      'QUEST NPC': [65, 40, 25, 80],
+      'MERCHANT NPC': [75, 25, 20, 85],
+      'CONFUSED NPC': [35, 75, 80, 25],
+      'GUARD NPC': [80, 20, 15, 90],
+      'CUTSCENE NPC': [85, 15, 10, 95],
+    };
+
+    let bestType: NPCType = 'COMMON NPC';
+    let maxSim = -1;
+
+    for (const [type, centroid] of Object.entries(centroids)) {
+      const sim = this.calculateCosineSimilarity(userVector, centroid);
+      if (sim > maxSim) {
+        maxSim = sim;
+        bestType = type as NPCType;
+      }
+    }
+
+    return bestType;
   }
 
   /**
@@ -46,10 +135,11 @@ export class ScoringEngine {
     score: number;
     dominantType: NPCType;
     observations: string[];
+    shannonEntropy: number;
   } {
     const options = Object.values(answers);
     if (options.length === 0) {
-      return { score: 50, dominantType: 'COMMON NPC', observations: [] };
+      return { score: 50, dominantType: 'COMMON NPC', observations: [], shannonEntropy: 50 };
     }
 
     const maxPerQuestion = 35;
@@ -57,28 +147,15 @@ export class ScoringEngine {
     const totalRaw = options.reduce((sum, opt) => sum + opt.scoreContribution, 0);
 
     const normalizedScore = Math.round(Math.min(100, Math.max(0, (totalRaw / totalMax) * 100)));
+    const shannonEntropy = this.calculateShannonEntropy(options);
 
-    // Count archetype occurrences
-    const typeCounts: Record<string, number> = {};
-    options.forEach((opt) => {
-      typeCounts[opt.npcType] = (typeCounts[opt.npcType] || 0) + 1;
-    });
-
-    let dominantType: NPCType = options[0].npcType;
-    let maxCount = 0;
-    for (const [type, count] of Object.entries(typeCounts)) {
-      if (count > maxCount) {
-        maxCount = count;
-        dominantType = type as NPCType;
-      }
-    }
-
-    // If score is extreme, override dominant type
-    if (normalizedScore <= 20) {
-      dominantType = 'MAIN CHARACTER';
-    } else if (normalizedScore >= 96) {
-      dominantType = 'FINAL BOSS NPC';
-    }
+    // Vector Clustering Archetype Assignment
+    const dominantType = this.determineClusteredArchetype(
+      normalizedScore,
+      shannonEntropy,
+      100 - normalizedScore,
+      normalizedScore
+    );
 
     // Collect observation flavors
     const observations = options
@@ -89,6 +166,7 @@ export class ScoringEngine {
       score: normalizedScore,
       dominantType,
       observations,
+      shannonEntropy,
     };
   }
 

@@ -19,8 +19,8 @@ export const NPC_LEVELS: LevelDefinition[] = [
     badgeColor: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40',
     borderColor: 'border-emerald-500',
     glowColor: 'shadow-emerald-500/50',
-    summary: 'Erratic, non-linear movement trajectory detected. Demonstrates zero respect for game scripting.',
-    flavorQuote: '“Warning: Subject exhibits excessive protagonist energy. Quests may be derailed.”',
+    summary: 'Wild, unpredictable behavior detected. You refuse to follow boring routines or scripted expectations.',
+    flavorQuote: '“Warning: You possess powerful main-character energy! You live life entirely on your own terms.”',
   },
   {
     level: 'UNPREDICTABLE HUMAN',
@@ -29,8 +29,8 @@ export const NPC_LEVELS: LevelDefinition[] = [
     badgeColor: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40',
     borderColor: 'border-cyan-500',
     glowColor: 'shadow-cyan-500/50',
-    summary: 'Subject exhibits noticeable organic unpredictability. Partially immune to basic pathfinding AI.',
-    flavorQuote: '“Subject demonstrates occasional free will, though behavior remains suspicious.”',
+    summary: 'Highly creative and spontaneous. You mostly follow your own instincts rather than societal patterns.',
+    flavorQuote: '“You show genuine originality and free will, keeping people guessing what you will do next.”',
   },
   {
     level: 'BACKGROUND EXTRA',
@@ -39,8 +39,8 @@ export const NPC_LEVELS: LevelDefinition[] = [
     badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
     borderColor: 'border-amber-500',
     glowColor: 'shadow-amber-500/50',
-    summary: 'Blends into surroundings with minimal cognitive overhead. Fits standard urban backdrop parameters.',
-    flavorQuote: '“Ideal for populating low-density open world zones without dropping frame rates.”',
+    summary: 'Natural, comfortable crowd member. You keep your head down, do your work, and enjoy a peaceful life.',
+    flavorQuote: '“You blend right into the crowd effortlessly without causing any scene or unnecessary drama.”',
   },
   {
     level: 'COMMON NPC',
@@ -49,8 +49,8 @@ export const NPC_LEVELS: LevelDefinition[] = [
     badgeColor: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40',
     borderColor: 'border-indigo-500',
     glowColor: 'shadow-indigo-500/50',
-    summary: 'Reliable, predictable motion cycles. Likely to have 2 lines of unskippable ambient dialogue.',
-    flavorQuote: '“Subject follows predetermined navmesh with commendable obedience.”',
+    summary: 'Reliable and habit-driven. You prefer comfortable daily routines and polite everyday conversation.',
+    flavorQuote: '“You stick to polite small talk and proven daily habits with impressive discipline.”',
   },
   {
     level: 'HIGH LEVEL NPC',
@@ -59,8 +59,8 @@ export const NPC_LEVELS: LevelDefinition[] = [
     badgeColor: 'bg-purple-500/20 text-purple-300 border-purple-500/40',
     borderColor: 'border-purple-500',
     glowColor: 'shadow-purple-500/50',
-    summary: 'Exceptional repetition and prolonged idle behavior. Highly optimized for background loops.',
-    flavorQuote: '“Subject appears to be permanently waiting for the player to press [E] to interact.”',
+    summary: 'Master of habits and extreme routine. You rarely deviate from your established daily schedule.',
+    flavorQuote: '“Your daily schedule is so organized that your entire week could be planned in advance!”',
   },
   {
     level: 'FINAL BOSS NPC',
@@ -69,8 +69,8 @@ export const NPC_LEVELS: LevelDefinition[] = [
     badgeColor: 'bg-rose-500/20 text-rose-300 border-rose-500/40',
     borderColor: 'border-rose-500',
     glowColor: 'shadow-rose-500/50',
-    summary: 'Theoretical maximum NPC compliance. Perfectly scripted existence with absolute zero entropy.',
-    flavorQuote: '“System admiration level: 100%. The ultimate manifestation of automated existence.”',
+    summary: 'Flawless routine execution. You follow rules and schedules with perfection and zero hesitation.',
+    flavorQuote: '“100% Habit Discipline! You are the ultimate master of unshakeable daily routine.”',
   },
 ];
 

@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowRight, ArrowLeft, Brain, Sparkles, AlertTriangle, Check, Camera, Award } from 'lucide-react';
-import { QUIZ_QUESTIONS } from '../../constants/quizQuestions';
-import type { QuizOption } from '../../constants/quizQuestions';
+import { ArrowRight, ArrowLeft, Brain, Sparkles, AlertTriangle, Check, Camera, Award, Shuffle } from 'lucide-react';
+import { getRandomQuestions } from '../../constants/quizQuestions';
+import type { QuizOption, QuizQuestion } from '../../constants/quizQuestions';
 import { soundEffects } from '../../services/audioService';
 
 interface QuizAssessmentProps {
-  onComplete: (answers: Record<number, QuizOption>, wantsBiometricCheck: boolean) => void;
+  onComplete: (answers: Record<number, QuizOption>, wantsBiometricCheck: boolean, averageLatencyMs?: number) => void;
   onCancel: () => void;
 }
 
@@ -13,21 +13,31 @@ export const QuizAssessment: React.FC<QuizAssessmentProps> = ({
   onComplete,
   onCancel,
 }) => {
+  const [questions, setQuestions] = useState<QuizQuestion[]>(() => getRandomQuestions(6));
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, QuizOption>>({});
   
+  // Latency & timing tracking
+  const questionStartTimeRef = useRef<number>(performance.now());
+  const latenciesRef = useRef<number[]>([]);
+
   // Reflex mini-challenge timer
   const [challengeTimer, setChallengeTimer] = useState<number>(3);
   const [buttonSpamCount, setButtonSpamCount] = useState<number>(0);
   const challengeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const currentQuestion = QUIZ_QUESTIONS[currentStep];
-  const totalQuestions = QUIZ_QUESTIONS.length;
+  const currentQuestion = questions[currentStep] || questions[0];
+  const totalQuestions = questions.length;
   const progressPercent = Math.round(((currentStep + 1) / totalQuestions) * 100);
+
+  // Track question mount time
+  useEffect(() => {
+    questionStartTimeRef.current = performance.now();
+  }, [currentStep]);
 
   // Handle Challenge Question countdown
   useEffect(() => {
-    if (currentQuestion.isReflexChallenge) {
+    if (currentQuestion?.isReflexChallenge) {
       setChallengeTimer(3);
       setButtonSpamCount(0);
       challengeIntervalRef.current = setInterval(() => {
@@ -48,7 +58,25 @@ export const QuizAssessment: React.FC<QuizAssessmentProps> = ({
     };
   }, [currentQuestion]);
 
+  const handleReroll = () => {
+    soundEffects.playClick(1600);
+    setQuestions(getRandomQuestions(6));
+    setCurrentStep(0);
+    setSelectedAnswers({});
+    latenciesRef.current = [];
+    questionStartTimeRef.current = performance.now();
+  };
+
+  const getAvgLatency = (): number | undefined => {
+    if (latenciesRef.current.length === 0) return undefined;
+    const sum = latenciesRef.current.reduce((a, b) => a + b, 0);
+    return Math.round(sum / latenciesRef.current.length);
+  };
+
   const handleSelectOption = (option: QuizOption) => {
+    const elapsed = performance.now() - questionStartTimeRef.current;
+    latenciesRef.current.push(elapsed);
+
     soundEffects.playClick(1400);
     const updated = { ...selectedAnswers, [currentQuestion.id]: option };
     setSelectedAnswers(updated);
@@ -66,8 +94,8 @@ export const QuizAssessment: React.FC<QuizAssessmentProps> = ({
     setButtonSpamCount(nextCount);
 
     if (nextCount >= 3) {
-      // Pick rogue protagonist option
-      const rogueOption = currentQuestion.options.find((o) => o.id === '6c') || currentQuestion.options[2];
+      // Pick rogue protagonist option with 0 score contribution
+      const rogueOption = currentQuestion.options.find((o) => o.scoreContribution === 0) || currentQuestion.options[2];
       handleSelectOption(rogueOption);
     }
   };
@@ -86,9 +114,19 @@ export const QuizAssessment: React.FC<QuizAssessmentProps> = ({
               PSYCHOLOGICAL SCENARIO ASSESSMENT
             </span>
           </div>
-          <span className="text-xs text-cyber-green font-bold">
-            QUESTION {currentStep + 1} OF {totalQuestions}
-          </span>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleReroll}
+              title="Shuffle and load a new set of random questions"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-cyber-purple/20 border border-cyber-purple/40 text-cyber-purple hover:bg-cyber-purple/30 text-xs font-bold transition-all"
+            >
+              <Shuffle className="w-3.5 h-3.5" />
+              <span>REROLL QUESTIONS</span>
+            </button>
+            <span className="text-xs text-cyber-green font-bold">
+              QUESTION {currentStep + 1} OF {totalQuestions}
+            </span>
+          </div>
         </div>
 
         {/* Animated Progress Bar */}
@@ -116,7 +154,7 @@ export const QuizAssessment: React.FC<QuizAssessmentProps> = ({
           › {currentQuestion.prompt}
         </p>
 
-        {/* Interactive Reflex Challenge for Question 6 */}
+        {/* Interactive Reflex Challenge */}
         {currentQuestion.isReflexChallenge && (
           <div className="bg-black/60 border border-cyber-crimson/50 rounded-xl p-5 text-center my-4 box-glow-green space-y-4">
             <div className="flex items-center justify-center gap-2 text-cyber-crimson font-bold text-xs animate-pulse">
@@ -138,7 +176,7 @@ export const QuizAssessment: React.FC<QuizAssessmentProps> = ({
 
         {/* Multiple Choice Options Grid */}
         <div className="space-y-3">
-          {currentQuestion.options.map((option) => {
+          {currentQuestion.options.map((option, idx) => {
             const isSelected = selectedAnswers[currentQuestion.id]?.id === option.id;
             return (
               <button
@@ -157,7 +195,7 @@ export const QuizAssessment: React.FC<QuizAssessmentProps> = ({
                       : 'bg-black/50 border-slate-700 text-slate-400'
                   }`}
                 >
-                  {isSelected ? <Check className="w-3.5 h-3.5 stroke-[3]" /> : option.id.slice(-1).toUpperCase()}
+                  {isSelected ? <Check className="w-3.5 h-3.5 stroke-[3]" /> : String.fromCharCode(65 + idx)}
                 </div>
 
                 <div className="flex-1 min-w-0">
@@ -200,7 +238,7 @@ export const QuizAssessment: React.FC<QuizAssessmentProps> = ({
           {isFinalStep && isCurrentAnswered ? (
             <div className="flex flex-wrap items-center gap-2">
               <button
-                onClick={() => onComplete(selectedAnswers, true)}
+                onClick={() => onComplete(selectedAnswers, true, getAvgLatency())}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-cyber-cyan text-black font-display font-bold text-xs tracking-wider hover:bg-cyan-300 box-glow-cyan transition-all"
               >
                 <Camera className="w-4 h-4" />
@@ -208,7 +246,7 @@ export const QuizAssessment: React.FC<QuizAssessmentProps> = ({
               </button>
 
               <button
-                onClick={() => onComplete(selectedAnswers, false)}
+                onClick={() => onComplete(selectedAnswers, false, getAvgLatency())}
                 className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-cyber-green text-black font-display font-bold text-xs tracking-wider hover:bg-cyber-greenGlow box-glow-green transition-all transform hover:scale-[1.02]"
               >
                 <Award className="w-4 h-4" />
@@ -235,3 +273,4 @@ export const QuizAssessment: React.FC<QuizAssessmentProps> = ({
     </div>
   );
 };
+
